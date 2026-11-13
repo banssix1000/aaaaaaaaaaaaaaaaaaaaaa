@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Campanha de Doação — Abrigo Exemplo</title>
+  <style>
+    :root {
+      --bg-page: #f3f4f6;
+      --bg-card: #ffffff;
+      --bg-pix: #fffbeb;
+      --border-pix: #fde68a;
+      --bg-footer: #1c1612;
+      --bg-footer-pill: #2a221c;
+      --text-main: #111827;
+      --text-muted: #57534e;
+      --brand-brown: #7c4a1d;
+      --green: #16a34a;
+      --green-dark: #15803d;
+      --green-soft: #dcfce7;
+      --orange: #f97316;
+      --orange-dark: #d97706;
+      --orange-hover: #ea580c;
+      --red-badge: #dc2626;
+      --blue-info: #2563eb;
+      --border-light: #e5e7eb;
+      --radius-lg: 22px;
+      --radius-md: 14px;
+      --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.07);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg-page); color: var(--text-main); line-height: 1.5;
+      padding-bottom: 72px; -webkit-font-smoothing: antialiased;
+    }
+
+    .topbar {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(255, 255, 255, 0.94); backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-light); padding: 10px 16px;
+    }
+    .topbar-inner { max-width: 580px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .brand-logo {
+      width: 42px; height: 42px; border-radius: 50%; border: 2px solid #eab308;
+      background: #fef9c3; color: var(--brand-brown); display: grid; place-items: center; flex-shrink: 0;
+    }
+    .brand-name { font-weight: 800; font-size: 14px; line-height: 1.2; color: var(--brand-brown); }
+    .btn-donate-top {
+      background: var(--green); color: #fff; text-decoration: none; font-weight: 700;
+      font-size: 13px; padding: 10px 16px; border-radius: 999px; display: inline-flex;
+      align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25); flex-shrink: 0;
+    }
+
+    .hero {
+      position: relative; min-height: 450px; display: flex; align-items: center; justify-content: center;
+      text-align: center; color: #fff; padding: 52px 20px 76px; background-color: #1c1612;
+      background-image: linear-gradient(to bottom, rgba(0,0,0,0.42), rgba(0,0,0,0.82)), url("imagens/hero.jpg");
+      background-size: cover; background-position: center;
+    }
+    .hero-content { max-width: 490px; margin: 0 auto; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 6px; background: var(--red-badge); color: #fff;
+      font-size: 11px; font-weight: 800; letter-spacing: 0.9px; text-transform: uppercase;
+      padding: 6px 14px; border-radius: 999px; margin-bottom: 16px;
+    }
+    .pulse-dot { width: 7px; height: 7px; border-radius: 50%; background: #fff; animation: pulse 1.6s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(1.35)} }
+    .hero h1 { font-size: clamp(30px, 7.5vw, 44px); font-weight: 900; line-height: 1.08; margin-bottom: 14px; }
+    .hero p { font-size: 16px; color: #f3f4f6; margin-bottom: 24px; }
+    .hero-actions { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+    .hero-cta {
+      display: inline-flex; align-items: center; justify-content: center; background: var(--orange);
+      color: #fff; text-decoration: none; font-weight: 800; font-size: 16px; padding: 16px 32px;
+      border-radius: 14px; box-shadow: 0 10px 24px rgba(249,115,22,0.45);
+    }
+    .hero-secondary { color: rgba(255,255,255,0.9); font-size: 13px; font-weight: 600; text-underline-offset: 3px; }
+
+    .container { max-width: 580px; margin: -38px auto 0; padding: 0 16px 32px; position: relative; z-index: 10; }
+    .stats-strip {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: #fff;
+      border-radius: 18px; padding: 14px 10px; box-shadow: var(--shadow-card); margin-bottom: 18px;
+    }
+    .stat-item { text-align: center; padding: 4px; }
+    .stat-item:not(:last-child) { border-right: 1px solid var(--border-light); }
+    .stat-number { display: block; font-size: 20px; font-weight: 900; color: var(--brand-brown); line-height: 1.1; }
+    .stat-label { font-size: 11px; font-weight: 600; color: var(--text-muted); }
+
+    .card { background: var(--bg-card); border-radius: var(--radius-lg); padding: 22px 18px; box-shadow: var(--shadow-card); margin-bottom: 20px; }
+    .goal-box { background: #f9fafb; border: 1px solid var(--border-light); border-radius: 14px; padding: 14px 16px; margin-bottom: 22px; }
+    .goal-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 13px; margin-bottom: 8px; }
+    .goal-title { font-weight: 700; color: #374151; }
+    .goal-numbers { font-weight: 800; color: var(--green-dark); }
+    .goal-track { height: 10px; background: #e5e7eb; border-radius: 999px; overflow: hidden; }
+    .goal-fill { height: 100%; width: 64%; background: linear-gradient(90deg, var(--green), #22c55e); border-radius: 999px; }
+    .goal-caption { margin-top: 6px; font-size: 12px; color: var(--text-muted); }
+
+    .section-intro { text-align: center; margin-bottom: 16px; }
+    .section-intro h2 { font-size: 21px; font-weight: 800; margin-bottom: 4px; }
+    .section-intro p { font-size: 14px; color: var(--text-muted); }
+
+    .amount-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 12px; }
+    .amount-btn {
+      position: relative; background: #fff; border: 1.5px solid var(--border-light); border-radius: 12px;
+      padding: 14px 8px; font-size: 16px; font-weight: 700; color: #1f2937; cursor: pointer;
+    }
+    .amount-btn.active { border-color: var(--green); background: var(--green-soft); color: var(--green-dark); box-shadow: 0 0 0 2px rgba(22,163,74,0.18); }
+    .popular-tag {
+      position: absolute; top: -8px; left: 50%; transform: translateX(-50%); background: var(--green);
+      color: #fff; font-size: 9px; font-weight: 800; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; white-space: nowrap;
+    }
+
+    .custom-amount-wrap {
+      display: flex; align-items: center; border: 1.5px solid var(--border-light);
+      border-radius: 12px; padding: 4px 12px; margin-bottom: 14px; background: #fff;
+    }
+    .custom-amount-prefix { font-weight: 800; color: var(--text-muted); margin-right: 8px; font-size: 15px; }
+    .custom-amount-input { width: 100%; border: none; outline: none; font-size: 15px; font-weight: 700; padding: 10px 0; background: transparent; }
+
+    .impact-banner {
+      display: none; align-items: center; gap: 10px; background: #f0fdf4; border: 1px solid #bbf7d0;
+      border-radius: 12px; padding: 12px 14px; margin-bottom: 18px; font-size: 13px; color: #166534;
+    }
+    .impact-banner.visible { display: flex; }
+    .impact-icon { width: 30px; height: 30px; border-radius: 8px; background: #bbf7d0; color: #15803d; display: grid; place-items: center; flex-shrink: 0; }
+
+    .pix-box { background: var(--bg-pix); border: 1px solid var(--border-pix); border-radius: var(--radius-md); padding: 20px 16px; text-align: center; }
+    .pix-title { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 17px; font-weight: 800; margin-bottom: 14px; }
+    .btn-generate-pix {
+      width: 100%; border: none; border-radius: 12px; background: var(--green); color: #fff;
+      font-size: 16px; font-weight: 800; padding: 15px 18px; cursor: pointer; display: inline-flex;
+      align-items: center; justify-content: center; gap: 8px; box-shadow: 0 6px 18px rgba(22, 163, 74, 0.28);
+    }
+    .btn-generate-pix:disabled { opacity: 0.65; cursor: not-allowed; }
+    .pix-error {
+      display: none; margin-top: 12px; background: #fef2f2; border: 1px solid #fecaca;
+      color: #b91c1c; padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 600; text-align: left;
+    }
+    .pix-error.visible { display: block; }
+    .qr-result { display: none; margin-top: 16px; background: #fff; border: 1px solid var(--border-pix); border-radius: 14px; padding: 18px 14px; }
+    .qr-result.visible { display: block; }
+    .qr-timer { font-size: 13px; font-weight: 700; color: var(--orange-dark); margin-bottom: 10px; }
+    .qr-image { width: 210px; height: 210px; max-width: 100%; border-radius: 12px; border: 1px solid var(--border-light); margin: 0 auto 12px; display: block; }
+    .qr-code-text {
+      background: #f9fafb; border: 1px solid var(--border-light); border-radius: 10px; padding: 10px;
+      font-size: 12px; font-family: monospace; word-break: break-all; max-height: 74px; overflow-y: auto; margin-bottom: 10px; text-align: left;
+    }
+    .btn-copy {
+      width: 100%; border: none; border-radius: 12px; background: var(--orange-dark); color: #fff;
+      font-size: 15px; font-weight: 700; padding: 13px 16px; cursor: pointer;
+    }
+    .status-waiting { font-size: 13px; font-weight: 600; color: #374151; margin-top: 12px; }
+    .payment-success-box { display: none; background: #f0fdf4; border: 2px solid #22c55e; border-radius: 14px; padding: 20px 16px; margin-top: 16px; color: #166534; }
+    .payment-success-box.visible { display: block; }
+    .pix-hint { font-size: 12px; color: #6b7280; margin-top: 10px; }
+
+    .section-heading { text-align: center; margin-bottom: 14px; }
+    .section-heading h2 { font-size: 21px; font-weight: 800; }
+    .section-heading p { font-size: 13px; color: var(--text-muted); }
+    .rescue-list { display: flex; flex-direction: column; gap: 16px; margin-bottom: 22px; }
+    .rescue-card { background: #fff; border-radius: 18px; overflow: hidden; box-shadow: var(--shadow-card); }
+    .rescue-media { position: relative; width: 100%; aspect-ratio: 4 / 3; background: #e5e7eb; cursor: zoom-in; overflow: hidden; }
+    .rescue-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .rescue-status { position: absolute; top: 12px; left: 12px; font-size: 11px; font-weight: 800; text-transform: uppercase; padding: 5px 11px; border-radius: 999px; color: #fff; }
+    .status-urgent { background: #dc2626; } .status-treatment { background: #d97706; } .status-care { background: #2563eb; }
+    .zoom-chip { position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.6); color: #fff; font-size: 11px; font-weight: 600; padding: 4px 9px; border-radius: 999px; }
+    .rescue-body { padding: 16px; }
+    .rescue-body h3 { font-size: 17px; font-weight: 800; margin-bottom: 6px; }
+    .rescue-body p { font-size: 14px; color: var(--text-muted); margin-bottom: 12px; }
+    .rescue-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-top: 10px; border-top: 1px solid var(--border-light); }
+    .rescue-need { font-size: 12px; font-weight: 700; color: var(--brand-brown); }
+    .btn-help-case { border: none; background: var(--green); color: #fff; font-size: 13px; font-weight: 700; padding: 9px 14px; border-radius: 10px; cursor: pointer; }
+
+    .tabs-nav { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; background: #f3f4f6; padding: 5px; border-radius: 12px; margin-bottom: 16px; }
+    .tab-btn { border: none; background: transparent; padding: 10px 6px; font-size: 12px; font-weight: 700; color: var(--text-muted); border-radius: 9px; cursor: pointer; }
+    .tab-btn.active { background: #fff; color: #111827; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .tab-panel { display: none; font-size: 14px; color: #374151; }
+    .tab-panel.active { display: block; }
+    .supply-list { list-style: none; display: flex; flex-direction: column; gap: 8px; margin: 12px 0 16px; }
+    .supply-list li { display: flex; align-items: center; justify-content: space-between; background: #f9fafb; border: 1px solid var(--border-light); padding: 9px 12px; border-radius: 10px; font-size: 13px; }
+    .supply-tag { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: #fee2e2; color: #b91c1c; }
+    .btn-whatsapp { width: 100%; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; background: #16a34a; color: #fff; font-weight: 700; font-size: 14px; padding: 12px 16px; border-radius: 12px; }
+
+    .supporters-list { display: flex; flex-direction: column; gap: 10px; }
+    .supporter-item { background: #f9fafb; border: 1px solid var(--border-light); border-radius: 12px; padding: 12px 14px; font-size: 13px; }
+    .supporter-top { display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 4px; }
+    .supporter-badge { color: var(--green-dark); font-size: 12px; }
+    .supporter-msg { color: var(--text-muted); font-style: italic; }
+
+    .share-card {
+      background: #fff; border: 1px solid var(--border-light); border-radius: 16px; padding: 16px;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px;
+    }
+    .share-text strong { display: block; font-size: 14px; }
+    .share-text span { font-size: 12px; color: var(--text-muted); }
+    .btn-share { border: 1.5px solid var(--green); background: #f0fdf4; color: var(--green-dark); font-weight: 700; font-size: 13px; padding: 10px 14px; border-radius: 10px; cursor: pointer; }
+
+    .faq-header { text-align: center; margin-bottom: 18px; }
+    .faq-title { font-size: 21px; font-weight: 800; margin-bottom: 4px; }
+    .faq-subtitle { font-size: 14px; color: var(--text-muted); }
+    .faq-list { display: flex; flex-direction: column; gap: 10px; }
+    .faq-item { border: 1px solid var(--border-light); border-radius: 14px; background: #fff; overflow: hidden; }
+    .faq-question { width: 100%; background: none; border: none; padding: 16px; text-align: left; font-size: 15px; font-weight: 600; color: #1f2937; display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; }
+    .faq-chevron { transition: transform 0.25s ease; flex-shrink: 0; color: #6b7280; }
+    .faq-item.open .faq-chevron { transform: rotate(180deg); }
+    .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.28s ease; padding: 0 16px; font-size: 14px; color: var(--text-muted); }
+    .faq-item.open .faq-answer { max-height: 220px; padding-bottom: 16px; }
+
+    .transparency-section { background: #fff; padding: 32px 16px 38px; border-top: 1px solid var(--border-light); }
+    .transparency-inner { max-width: 580px; margin: 0 auto; }
+    .transparency-inner h2 { font-size: 24px; font-weight: 800; margin-bottom: 10px; }
+    .transparency-inner p { font-size: 15px; color: #4b5563; margin-bottom: 14px; }
+    .breakdown-bar { display: flex; height: 14px; border-radius: 999px; overflow: hidden; margin: 12px 0; gap: 2px; }
+    .seg-food { width: 45%; background: #16a34a; } .seg-vet { width: 30%; background: #f97316; }
+    .seg-meds { width: 15%; background: #2563eb; } .seg-infra { width: 10%; background: #8b5cf6; }
+    .legend-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 22px; font-size: 13px; }
+    .legend-item { display: flex; align-items: center; gap: 8px; color: #374151; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .check-list { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+    .check-item { display: flex; align-items: center; gap: 12px; font-size: 15px; color: #374151; }
+    .check-icon { width: 28px; height: 28px; border-radius: 8px; background: var(--green-soft); color: var(--green); display: grid; place-items: center; flex-shrink: 0; }
+
+    .footer { background: var(--bg-footer); color: #e7e5e4; padding: 36px 16px 28px; text-align: center; }
+    .footer-inner { max-width: 580px; margin: 0 auto; }
+    .footer-brand { display: inline-flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+    .footer-logo { width: 46px; height: 46px; border-radius: 50%; border: 2px solid #a16207; background: #2c241d; display: grid; place-items: center; }
+    .footer-brand-name { font-size: 18px; font-weight: 700; color: #fff; }
+    .footer-address { background: var(--bg-footer-pill); border-radius: 999px; padding: 12px 20px; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: #d6d3d1; margin-bottom: 18px; }
+    .footer-links { display: flex; justify-content: center; gap: 18px; margin-bottom: 22px; font-size: 13px; }
+    .footer-links a { color: #d6d3d1; text-decoration: none; }
+    .footer-copy { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 18px; font-size: 12px; color: #a8a29e; }
+
+    .floating-bar {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 45; background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(10px); border-top: 1px solid var(--border-light); padding: 10px 16px;
+      transform: translateY(100%); transition: transform 0.28s ease;
+    }
+    .floating-bar.visible { transform: translateY(0); }
+    .floating-bar-inner { max-width: 580px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .floating-info { font-size: 12px; color: var(--text-muted); }
+    .floating-info strong { display: block; font-size: 14px; color: #111827; }
+    .floating-cta { background: var(--green); color: #fff; text-decoration: none; font-weight: 800; font-size: 14px; padding: 11px 18px; border-radius: 12px; white-space: nowrap; }
+
+    .lightbox { position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.88); display: none; align-items: center; justify-content: center; padding: 20px; }
+    .lightbox.open { display: flex; }
+    .lightbox img { max-width: 100%; max-height: 88vh; border-radius: 14px; }
+    .lightbox-close { position: absolute; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 50%; border: none; background: rgba(255,255,255,0.16); color: #fff; font-size: 22px; cursor: pointer; }
+    .toast {
+      position: fixed; left: 50%; bottom: 84px; transform: translateX(-50%) translateY(20px);
+      background: #111827; color: #fff; font-size: 13px; font-weight: 600; padding: 11px 18px;
+      border-radius: 999px; opacity: 0; pointer-events: none; transition: 0.25s; z-index: 90;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 420px) {
+      .share-card { flex-direction: column; align-items: stretch; text-align: center; }
+      .legend-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a href="#" class="brand">
+        <div class="brand-logo" aria-hidden="true">🐾</div>
+        <div class="brand-name">Nome do Seu<br />Abrigo / Projeto</div>
+      </a>
+      <a href="#doar" class="btn-donate-top">DOAR</a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-content">
+      <span class="hero-badge"><span class="pulse-dot"></span>Urgência Máxima</span>
+      <h1>Eles só têm você.</h1>
+      <p>Sua doação salva vidas reais. Ajude-nos a comprar ração e medicamentos hoje.</p>
+      <div class="hero-actions">
+        <a href="#doar" class="hero-cta">QUERO AJUDAR AGORA</a>
+        <a href="#resgates" class="hero-secondary">Conhecer os casos urgentes</a>
+      </div>
+    </div>
+  </section>
+
+  <main class="container">
+    <section class="stats-strip" aria-label="Números do abrigo">
+      <div class="stat-item"><span class="stat-number" data-target="140" data-suffix="+">0</span><span class="stat-label">Resgatados</span></div>
+      <div class="stat-item"><span class="stat-number" data-target="85" data-suffix="">0</span><span class="stat-label">Em cuidado diário</span></div>
+      <div class="stat-item"><span class="stat-number" data-target="100" data-suffix="%">0</span><span class="stat-label">De doações</span></div>
+    </section>
+
+    <section id="doar" class="card">
+      <div class="goal-box">
+        <div class="goal-top">
+          <span class="goal-title">Meta mensal (ração e remédios)</span>
+          <span class="goal-numbers">R$ 3.200 / R$ 5.000</span>
+        </div>
+        <div class="goal-track"><div class="goal-fill"></div></div>
+        <div class="goal-caption">64% da meta atingida neste mês. Qualquer valor faz diferença.</div>
+      </div>
+
+      <div class="section-intro">
+        <h2>Escolha o valor da sua ajuda</h2>
+        <p>Selecione uma quantia ou digite outro valor para gerar o QR Code PIX.</p>
+      </div>
+
+      <div class="amount-grid" id="amountGrid">
+        <button type="button" class="amount-btn" data-amount="25">R$ 25</button>
+        <button type="button" class="amount-btn" data-amount="30">R$ 30</button>
+        <button type="button" class="amount-btn" data-amount="40">R$ 40</button>
+        <button type="button" class="amount-btn active" data-amount="50"><span class="popular-tag">Mais escolhido</span>R$ 50</button>
+        <button type="button" class="amount-btn" data-amount="75">R$ 75</button>
+        <button type="button" class="amount-btn" data-amount="100">R$ 100</button>
+        <button type="button" class="amount-btn" data-amount="150">R$ 150</button>
+        <button type="button" class="amount-btn" data-amount="200">R$ 200</button>
+        <button type="button" class="amount-btn" data-amount="250">R$ 250</button>
+        <button type="button" class="amount-btn" data-amount="300">R$ 300</button>
+        <button type="button" class="amount-btn" data-amount="400">R$ 400</button>
+        <button type="button" class="amount-btn" data-amount="500">R$ 500</button>
+      </div>
+
+      <div class="custom-amount-wrap">
+        <span class="custom-amount-prefix">R$</span>
+        <input type="number" min="1" step="0.01" inputmode="decimal" class="custom-amount-input" id="customAmountInput" placeholder="Ou digite outro valor (mínimo R$ 1,00)" />
+      </div>
+
+      <div class="impact-banner visible" id="impactBanner">
+        <div class="impact-icon">✓</div>
+        <div><strong id="selectedAmountText">R$ 50</strong> — <span id="impactDescription">Ajuda com vermífugos, remédios e alimentação diária.</span></div>
+      </div>
+
+      <div class="pix-box">
+        <div class="pix-title"><span>Pagamento instantâneo via PIX</span></div>
+
+        <button type="button" class="btn-generate-pix" id="generatePixBtn">
+          Gerar QR Code PIX (R$ 50,00)
+        </button>
+
+        <div class="pix-error" id="pixError" role="alert"></div>
+
+        <div class="qr-result" id="qrResult">
+          <div class="qr-timer" id="qrTimer">Expira em 30:00</div>
+          <img id="qrImage" class="qr-image" src="" alt="QR Code PIX para doação" />
+          <div class="qr-code-text" id="qrCopiaCola"></div>
+          <button type="button" class="btn-copy" id="copyPixCodeBtn">
+            <span id="copyPixCodeLabel">Copiar PIX Copia e Cola</span>
+          </button>
+          <div class="status-waiting">Aguardando confirmação automática do pagamento...</div>
+        </div>
+
+        <div class="payment-success-box" id="paymentSuccessBox">
+          <h3>Doação confirmada!</h3>
+          <p>Muito obrigado pela sua ajuda. O pagamento via PIX foi recebido com sucesso.</p>
+        </div>
+
+        <p class="pix-hint">O QR Code é gerado na hora e a confirmação aparece automaticamente nesta tela.</p>
+      </div>
+    </section>
+
+    <section id="resgates">
+      <div class="section-heading">
+        <h2>Casos que precisam de apoio</h2>
+        <p>Toque na foto para ampliar ou clique para direcionar sua ajuda.</p>
+      </div>
+      <div class="rescue-list">
+        <article class="rescue-card">
+          <div class="rescue-media" data-full="imagens/resgate-1.jpg">
+            <img src="imagens/resgate-1.jpg" alt="Cachorrinha resgatada precisando de ajuda" />
+            <span class="rescue-status status-urgent">Urgente</span>
+            <span class="zoom-chip">Toque para ampliar</span>
+          </div>
+          <div class="rescue-body">
+            <h3>Cachorrinha em risco extremo</h3>
+            <p>Encontrada muito debilitada e precisando de exames, hidratação e medicação imediata.</p>
+            <div class="rescue-footer">
+              <span class="rescue-need">Ajuda sugerida: R$ 50</span>
+              <button type="button" class="btn-help-case" data-suggest="50">Ajudar neste caso</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="rescue-card">
+          <div class="rescue-media" data-full="imagens/resgate-2.jpg">
+            <img src="imagens/resgate-2.jpg" alt="Cachorro com queimadura química em tratamento" />
+            <span class="rescue-status status-treatment">Em tratamento</span>
+            <span class="zoom-chip">Toque para ampliar</span>
+          </div>
+          <div class="rescue-body">
+            <h3>Recuperação de queimadura química</h3>
+            <p>Vítima de agressão com produto químico na pele. Precisa de pomadas cicatrizantes e antibióticos.</p>
+            <div class="rescue-footer">
+              <span class="rescue-need">Ajuda sugerida: R$ 75</span>
+              <button type="button" class="btn-help-case" data-suggest="75">Ajudar neste caso</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="rescue-card">
+          <div class="rescue-media" data-full="imagens/resgate-3.jpg">
+            <img src="imagens/resgate-3.jpg" alt="Cadela resgatada recebendo cuidados" />
+            <span class="rescue-status status-care">Acolhida</span>
+            <span class="zoom-chip">Toque para ampliar</span>
+          </div>
+          <div class="rescue-body">
+            <h3>Tratamento dermatológico e nutrição</h3>
+            <p>Retirada das ruas, passando por tratamento intenso contra sarna, anemia e desnutrição.</p>
+            <div class="rescue-footer">
+              <span class="rescue-need">Ajuda sugerida: R$ 100</span>
+              <button type="button" class="btn-help-case" data-suggest="100">Ajudar neste caso</button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-intro">
+        <h2>Outras formas de ajudar</h2>
+        <p>Não consegue doar em dinheiro agora? Veja como contribuir.</p>
+      </div>
+      <div class="tabs-nav" role="tablist">
+        <button type="button" class="tab-btn active" data-tab="itens">Itens Urgentes</button>
+        <button type="button" class="tab-btn" data-tab="padrinho">Apadrinhamento</button>
+        <button type="button" class="tab-btn" data-tab="voluntario">Voluntariado</button>
+      </div>
+      <div class="tab-panel active" id="tab-itens">
+        <p>Entregue doações físicas no abrigo ou combine pelo WhatsApp:</p>
+        <ul class="supply-list">
+          <li><span>Ração para cães adultos e filhotes</span><span class="supply-tag">Crítico</span></li>
+          <li><span>Vermífugos, antipulgas e pomadas</span><span class="supply-tag">Urgente</span></li>
+          <li><span>Gaze, soro fisiológico e água sanitária</span><span class="supply-tag">Em falta</span></li>
+        </ul>
+        <a href="https://wa.me/5500000000000?text=Ol%C3%A1!%20Gostaria%20de%20doar%20ra%C3%A7%C3%A3o%20ou%20itens." target="_blank" rel="noopener" class="btn-whatsapp">Combinar entrega no WhatsApp</a>
+      </div>
+      <div class="tab-panel" id="tab-padrinho">
+        <p style="margin-bottom: 12px;">Apadrinhando um animal mensalmente, você garante ração e exames contínuos.</p>
+        <a href="https://wa.me/5500000000000?text=Ol%C3%A1!%20Quero%20apadrinhar%20um%20animal." target="_blank" rel="noopener" class="btn-whatsapp">Quero ser padrinho/madrinha</a>
+      </div>
+      <div class="tab-panel" id="tab-voluntario">
+        <p style="margin-bottom: 12px;">Precisamos de apoio com banhos, passeios, limpeza e divulgação para adoção.</p>
+        <a href="https://wa.me/5500000000000?text=Ol%C3%A1!%20Quero%20ser%20volunt%C3%A1rio." target="_blank" rel="noopener" class="btn-whatsapp">Quero ser voluntário(a)</a>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-intro"><h2>Quem já está ajudando</h2><p>Mensagens de apoio enviadas pela comunidade.</p></div>
+      <div class="supporters-list">
+        <div class="supporter-item"><div class="supporter-top"><span>Mariana S.</span><span class="supporter-badge">Apoio via Pix</span></div><div class="supporter-msg">"Que Deus abençoe vocês por não desistirem desses anjinhos."</div></div>
+        <div class="supporter-item"><div class="supporter-top"><span>Carlos Eduardo</span><span class="supporter-badge">Apoio via Pix</span></div><div class="supporter-msg">"Fiz minha parte hoje para ajudar na compra de ração!"</div></div>
+        <div class="supporter-item"><div class="supporter-top"><span>Ana Paula M.</span><span class="supporter-badge">Compartilhou + Doou</span></div><div class="supporter-msg">"Acompanhando a recuperação do bichinho, força para toda a equipe."</div></div>
+      </div>
+    </section>
+
+    <div class="share-card">
+      <div class="share-text"><strong>Não pode doar agora?</strong><span>Compartilhar a campanha também salva vidas.</span></div>
+      <button type="button" class="btn-share" id="shareBtn">Compartilhar</button>
+    </div>
+
+    <section class="card">
+      <div class="faq-header"><div class="faq-title">Perguntas Frequentes</div><p class="faq-subtitle">Transparência é nosso compromisso com você.</p></div>
+      <div class="faq-list">
+        <div class="faq-item"><button type="button" class="faq-question" aria-expanded="false"><span>Para onde vai o dinheiro da minha doação?</span><svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 12 15 18 9"/></svg></button><div class="faq-answer">Os recursos são destinados à compra de ração, medicamentos, atendimentos veterinários e manutenção do abrigo.</div></div>
+        <div class="faq-item"><button type="button" class="faq-question" aria-expanded="false"><span>É seguro doar através do site?</span><svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 12 15 18 9"/></svg></button><div class="faq-answer">Sim. O QR Code é gerado dinamicamente e pago diretamente no aplicativo do seu banco.</div></div>
+        <div class="faq-item"><button type="button" class="faq-question" aria-expanded="false"><span>Posso doar ração ou remédios ao invés de dinheiro?</span><svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 12 15 18 9"/></svg></button><div class="faq-answer">Sim! Entregue presencialmente no endereço do rodapé ou combine pelo nosso WhatsApp.</div></div>
+        <div class="faq-item"><button type="button" class="faq-question" aria-expanded="false"><span>Como posso acompanhar o uso das doações?</span><svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 12 15 18 9"/></svg></button><div class="faq-answer">Publicamos relatórios mensais de prestação de contas e atualizações dos resgates em nossas redes sociais.</div></div>
+      </div>
+    </section>
+  </main>
+
+  <section class="transparency-section">
+    <div class="transparency-inner">
+      <h2>Transparência Total</h2>
+      <p>Nosso projeto atua no acolhimento, tratamento e recuperação de animais em situação de vulnerabilidade.</p>
+      <div class="breakdown-bar"><div class="seg-food"></div><div class="seg-vet"></div><div class="seg-meds"></div><div class="seg-infra"></div></div>
+      <div class="legend-grid">
+        <div class="legend-item"><span class="legend-dot" style="background:#16a34a"></span>45% Ração e alimentação</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#f97316"></span>30% Veterinário e exames</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#2563eb"></span>15% Medicamentos e vacinas</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#8b5cf6"></span>10% Limpeza e estrutura</div>
+      </div>
+      <ul class="check-list">
+        <li class="check-item"><span class="check-icon">✓</span><span>Endereço Real: Rua Exemplo, 123 — Cidade, UF</span></li>
+        <li class="check-item"><span class="check-icon">✓</span><span>Visitas abertas ao público</span></li>
+        <li class="check-item"><span class="check-icon">✓</span><span>Prestação de contas mensal</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand"><div class="footer-logo">🐾</div><div class="footer-brand-name">Nome do Seu Abrigo / Projeto</div></div>
+      <div><div class="footer-address"><span>📍 Rua Exemplo, 123 — Cidade, UF</span></div></div>
+      <div class="footer-links"><a href="#doar">Doar</a><a href="#resgates">Resgates</a><a href="https://instagram.com" target="_blank" rel="noopener">Instagram</a></div>
+      <div class="footer-copy">© 2026 Nome do Seu Abrigo / Projeto. Todos os direitos reservados.</div>
+    </div>
+  </footer>
+
+  <div class="floating-bar" id="floatingBar">
+    <div class="floating-bar-inner">
+      <div class="floating-info"><strong>Ajude os resgatados</strong>Qualquer quantia via PIX faz diferença</div>
+      <a href="#doar" class="floating-cta">Doar agora</a>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true"><button type="button" class="lightbox-close" id="lightboxClose">×</button><img id="lightboxImg" src="" alt="" /></div>
+  <div class="toast" id="toast">Copiado!</div>
+
+  <script>
+    const impactMap = {
+      25: "Garante cerca de 2 kg de ração para um animal resgatado.",
+      30: "Ajuda com curativos e higienização de ferimentos.",
+      40: "Contribui com vitaminas e suplementos de recuperação.",
+      50: "Ajuda com vermífugos, remédios e alimentação diária.",
+      75: "Cobre parte de exames laboratoriais básicos.",
+      100: "Ajuda a custear uma consulta veterinária.",
+      150: "Garante um saco grande de ração para o abrigo.",
+      200: "Ajuda no tratamento completo de infecções de pele.",
+      250: "Contribui para vacinação e vermifugação de vários animais.",
+      300: "Apoia internações e medicações de urgência.",
+      400: "Ajuda a custear exames e cirurgias emergenciais.",
+      500: "Mantém alimentação e cuidados de vários resgatados."
+    };
+
+    let selectedAmount = 50;
+    let activeExternalId = null;
+    let pollInterval = null;
+    let countdownInterval = null;
+
+    const amountButtons = document.querySelectorAll(".amount-btn");
+    const customInput = document.getElementById("customAmountInput");
+    const impactBanner = document.getElementById("impactBanner");
+    const selectedAmountText = document.getElementById("selectedAmountText");
+    const impactDescription = document.getElementById("impactDescription");
+    const generatePixBtn = document.getElementById("generatePixBtn");
+    const pixError = document.getElementById("pixError");
+    const qrResult = document.getElementById("qrResult");
+    const qrImage = document.getElementById("qrImage");
+    const qrCopiaCola = document.getElementById("qrCopiaCola");
+    const qrTimer = document.getElementById("qrTimer");
+    const paymentSuccessBox = document.getElementById("paymentSuccessBox");
+    const toast = document.getElementById("toast");
+
+    function showPixError(msg) { pixError.textContent = msg; pixError.classList.add("visible"); }
+    function clearPixError() { pixError.textContent = ""; pixError.classList.remove("visible"); }
+
+    let toastTimer;
+    function showToast(msg) {
+      toast.textContent = msg; toast.classList.add("show");
+      clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.classList.remove("show"), 2600);
+    }
+
+    async function copyText(text) {
+      try { await navigator.clipboard.writeText(text); } catch {
+        const el = document.createElement("textarea"); el.value = text;
+        document.body.appendChild(el); el.select(); document.execCommand("copy"); document.body.removeChild(el);
+      }
+    }
+
+    function createExternalId() {
+      if (window.crypto?.randomUUID) return "doacao-" + crypto.randomUUID();
+      return "doacao-" + Date.now() + "-" + Math.random().toString(16).slice(2, 10);
+    }
+
+    function setAmount(val, fromInput = false) {
+      clearPixError();
+      const num = Number(val);
+      if (!num || num < 1) {
+        selectedAmount = 0;
+        generatePixBtn.textContent = "Informe um valor a partir de R$ 1,00";
+        generatePixBtn.disabled = true;
+        impactBanner.classList.remove("visible");
+        return;
+      }
+      selectedAmount = Math.round(num * 100) / 100;
+      activeExternalId = null;
+      generatePixBtn.disabled = false;
+      generatePixBtn.textContent = `Gerar QR Code PIX (R$ ${selectedAmount.toFixed(2).replace(".", ",")})`;
+      selectedAmountText.textContent = "R$ " + (Number.isInteger(selectedAmount) ? selectedAmount : selectedAmount.toFixed(2).replace(".", ","));
+      impactDescription.textContent = impactMap[selectedAmount] || "Ajuda diretamente na compra de ração, remédios e cuidados.";
+      impactBanner.classList.add("visible");
+      if (!fromInput) customInput.value = "";
+    }
+
+    amountButtons.forEach((btn) => btn.addEventListener("click", () => {
+      amountButtons.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      setAmount(btn.dataset.amount);
+    }));
+
+    customInput.addEventListener("input", () => {
+      amountButtons.forEach((b) => b.classList.remove("active"));
+      setAmount(customInput.value, true);
+    });
+
+    document.querySelectorAll(".btn-help-case").forEach((btn) => btn.addEventListener("click", () => {
+      const val = btn.dataset.suggest;
+      amountButtons.forEach((b) => b.classList.toggle("active", b.dataset.amount === val));
+      setAmount(val);
+      document.getElementById("doar").scrollIntoView({ behavior: "smooth" });
+    }));
+
+    function startCountdown(expiresAtIso) {
+      clearInterval(countdownInterval);
+      const expiresMs = new Date(expiresAtIso).getTime();
+      const update = () => {
+        const diffSec = Math.max(0, Math.floor((expiresMs - Date.now()) / 1000));
+        const min = String(Math.floor(diffSec / 60)).padStart(2, "0");
+        const sec = String(diffSec % 60).padStart(2, "0");
+        qrTimer.textContent = diffSec > 0 ? `Expira em ${min}:${sec}` : "QR Code expirado. Gere outro.";
+        if (diffSec <= 0) clearInterval(countdownInterval);
+      };
+      update();
+      countdownInterval = setInterval(update, 1000);
+    }
+
+    function startPolling(transactionId) {
+      clearInterval(pollInterval);
+      pollInterval = setInterval(async () => {
+        try {
+          const res = await fetch(`/api/donations/pix/${encodeURIComponent(transactionId)}`);
+          if (!res.ok) return;
+          const data = await res.json();
+          if (data.status === "paid") {
+            clearInterval(pollInterval); clearInterval(countdownInterval);
+            qrResult.classList.remove("visible"); paymentSuccessBox.classList.add("visible");
+            showToast("Pagamento confirmado! Muito obrigado!");
+          } else if (data.status === "expired" || data.status === "cancelled") {
+            clearInterval(pollInterval);
+            qrTimer.textContent = "Cobrança expirada. Clique acima para gerar outra.";
+          }
+        } catch {}
+      }, 4000);
+    }
+
+    generatePixBtn.addEventListener("click", async () => {
+      clearPixError();
+      if (window.location.protocol === "file:") {
+        showPixError("Você abriu o arquivo HTML direto. Acesse pelo servidor (Vercel ou http://localhost:3000).");
+        return;
+      }
+      if (!selectedAmount || selectedAmount < 1) {
+        showPixError("Escolha ou digite um valor de pelo menos R$ 1,00.");
+        return;
+      }
+      if (!activeExternalId) activeExternalId = createExternalId();
+
+      generatePixBtn.disabled = true;
+      generatePixBtn.textContent = "Gerando QR Code...";
+      paymentSuccessBox.classList.remove("visible");
+
+      try {
+        const res = await fetch("/api/donations/pix", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ amount: selectedAmount, external_id: activeExternalId })
+        });
+        const rawText = await res.text();
+        let data = {};
+        try { data = rawText ? JSON.parse(rawText) : {}; } catch {
+          throw new Error(`Servidor retornou HTTP ${res.status} sem JSON.`);
+        }
+        if (!res.ok) throw new Error(data.error || `Erro HTTP ${res.status} ao gerar PIX.`);
+
+        const tx = data.transaction;
+        if (!tx || !tx.pix_copia_cola) throw new Error("A API não retornou os dados do PIX.");
+
+        if (tx.qr_code_base64) {
+          qrImage.src = tx.qr_code_base64.startsWith("data:") ? tx.qr_code_base64 : `data:image/png;base64,${tx.qr_code_base64}`;
+          qrImage.style.display = "block";
+        } else {
+          qrImage.style.display = "none";
+        }
+
+        qrCopiaCola.textContent = tx.pix_copia_cola;
+        qrResult.classList.add("visible");
+        if (tx.expires_at) startCountdown(tx.expires_at); else qrTimer.textContent = "Aguardando pagamento";
+        if (tx.id) startPolling(tx.id);
+      } catch (err) {
+        showPixError(err.message || "Erro ao gerar QR Code PIX.");
+      } finally {
+        generatePixBtn.disabled = false;
+        generatePixBtn.textContent = `Gerar QR Code PIX (R$ ${selectedAmount.toFixed(2).replace(".", ",")})`;
+      }
+    });
+
+    document.getElementById("copyPixCodeBtn").addEventListener("click", async () => {
+      const code = qrCopiaCola.textContent.trim();
+      if (!code) return;
+      await copyText(code);
+      const label = document.getElementById("copyPixCodeLabel");
+      label.textContent = "Código PIX copiado!";
+      showToast("PIX Copia e Cola copiado!");
+      setTimeout(() => { label.textContent = "Copiar PIX Copia e Cola"; }, 2400);
+    });
+
+    document.querySelectorAll(".tab-btn").forEach((tab) => tab.addEventListener("click", () => {
+      document.querySelectorAll(".tab-btn").forEach((t) => t.classList.remove("active"));
+      document.querySelectorAll(".tab-panel").forEach((p) => p.classList.remove("active"));
+      tab.classList.add("active");
+      document.getElementById("tab-" + tab.dataset.tab).classList.add("active");
+    }));
+
+    document.getElementById("shareBtn").addEventListener("click", async () => {
+      const shareData = { title: document.title, text: "Ajude esse abrigo animal! Qualquer valor faz diferença:", url: window.location.href };
+      if (navigator.share) { try { await navigator.share(shareData); return; } catch {} }
+      window.open("https://wa.me/?text=" + encodeURIComponent(shareData.text + " " + shareData.url), "_blank", "noopener");
+    });
+
+    document.querySelectorAll(".faq-item").forEach((item) => {
+      const trigger = item.querySelector(".faq-question");
+      trigger.addEventListener("click", () => {
+        const isOpen = item.classList.contains("open");
+        document.querySelectorAll(".faq-item").forEach((i) => {
+          i.classList.remove("open");
+          i.querySelector(".faq-question").setAttribute("aria-expanded", "false");
+        });
+        if (!isOpen) { item.classList.add("open"); trigger.setAttribute("aria-expanded", "true"); }
+      });
+    });
+
+    const lightbox = document.getElementById("lightbox"), lightboxImg = document.getElementById("lightboxImg");
+    document.querySelectorAll(".rescue-media").forEach((media) => media.addEventListener("click", () => {
+      const img = media.querySelector("img");
+      lightboxImg.src = media.dataset.full || img.src; lightboxImg.alt = img.alt;
+      lightbox.classList.add("open");
+    }));
+    function closeLightbox() { lightbox.classList.remove("open"); lightboxImg.src = ""; }
+    document.getElementById("lightboxClose").addEventListener("click", closeLightbox);
+    lightbox.addEventListener("click", (e) => { if (e.target === lightbox) closeLightbox(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeLightbox(); });
+
+    document.querySelectorAll(".stat-number").forEach((el) => {
+      const target = Number(el.dataset.target), suffix = el.dataset.suffix || "";
+      let current = 0; const step = Math.max(1, Math.ceil(target / 35));
+      const timer = setInterval(() => {
+        current += step;
+        if (current >= target) { el.textContent = target + suffix; clearInterval(timer); }
+        else { el.textContent = current + suffix; }
+      }, 28);
+    });
+
+    const floatingBar = document.getElementById("floatingBar"), donateSection = document.getElementById("doar");
+    window.addEventListener("scroll", () => {
+      const rect = donateSection.getBoundingClientRect();
+      floatingBar.classList.toggle("visible", window.scrollY > 360 && !(rect.top < window.innerHeight * 0.7 && rect.bottom > 120));
+    }, { passive: true });
+  </script>
+</body>
+</html>
